@@ -55,7 +55,14 @@ function criarCategoriaSeNecessario(nome) {
   }
 }
 
-function criarRotasCrud({ rota, obterArray, camposObrigatorios, validarCriacao, validarAtualizacao, prepararCriacao }) {
+function normalizarCategoriaBody(body) {
+  if (body.categoriaId === undefined && body.categoriaid !== undefined) {
+    body.categoriaId = body.categoriaid;
+  }
+  delete body.categoriaid;
+}
+
+function criarRotasCrud({ rota, obterArray, camposObrigatorios, validarCriacao, validarAtualizacao, prepararBody, prepararCriacao }) {
   app.get(rota, (req, res) => res.json(obterArray()));
 
   app.get(`${rota}/:id`, (req, res) => {
@@ -66,6 +73,7 @@ function criarRotasCrud({ rota, obterArray, camposObrigatorios, validarCriacao, 
   });
 
   app.post(rota, (req, res) => {
+    prepararBody?.(req.body);
     if (!validarCampos(req.body, camposObrigatorios)) {
       return res.status(400).json({ erro: `Campos obrigatórios: ${camposObrigatorios.join(', ')}` });
     }
@@ -80,6 +88,7 @@ function criarRotasCrud({ rota, obterArray, camposObrigatorios, validarCriacao, 
   });
 
   app.put(`${rota}/:id`, (req, res) => {
+    prepararBody?.(req.body);
     const id = idValido(req.params.id);
     const array = obterArray();
     const indice = id && array.findIndex((registro) => registro.id === id);
@@ -142,6 +151,7 @@ criarRotasCrud({
   rota: '/produtos',
   obterArray: () => produtos,
   camposObrigatorios: ['nome', 'preco', 'categoriaId'],
+  prepararBody: normalizarCategoriaBody,
   prepararCriacao: (body) => criarCategoriaSeNecessario(body.categoriaId),
   validarAtualizacao: (body) => !categoriaExiste(body.categoriaId)
     ? { status: 400, mensagem: 'A categoria informada não existe' }
