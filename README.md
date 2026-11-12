@@ -54,6 +54,6 @@ Envie novamente o mesmo email. A resposta esperada é `409`.
 {
   "nome": "Fone de ouvido",
   "preco": 99.9,
-  "categoriaId": 1
+  "categoriaId": "Eletrônicos"
 }
 ```

@@ -175,7 +175,7 @@
       "name": "Criar produto",
       "description": "",
       "method": "POST",
-      "body": { "mimeType": "application/json", "text": "{\n  \"nome\": \"Fone de ouvido\",\n  \"preco\": 99.9,\n  \"categoriaId\": 1\n}" },
+      "body": { "mimeType": "application/json", "text": "{\n  \"nome\": \"Fone de ouvido\",\n  \"preco\": 99.9,\n  \"categoriaId\": \"Eletrônicos\"\n}" },
       "parameters": [],
       "headers": [{ "name": "Content-Type", "value": "application/json" }],
       "authentication": {},

@@ -18,6 +18,7 @@ let clientes = [
 let categorias = [
   { id: 1, nome: 'Eletrônicos', descricao: 'Produtos eletrônicos' },
   { id: 2, nome: 'Livros', descricao: 'Livros e materiais de leitura' },
+  { id: 3, nome: 'Coisas de escritório', descricao: 'Materiais para escritório' },
 ];
 
 let fornecedores = [
@@ -34,7 +35,7 @@ let produtos = [
     id: 1,
     nome: 'Smartphone XYZ',
     preco: 1999.99,
-    categoriaId: 1,
+    categoriaId: 'Eletrônicos',
   },
 ];
 
@@ -49,6 +50,10 @@ function validarCampos(body, campos) {
 function idValido(param) {
   const id = Number(param);
   return Number.isInteger(id) && id > 0 ? id : null;
+}
+
+function categoriaExiste(valor) {
+  return categorias.some((categoria) => categoria.nome.toLowerCase() === String(valor).trim().toLowerCase());
 }
 
 function criarRotasCrud({ rota, obterArray, camposObrigatorios, validarCriacao, validarAtualizacao }) {
@@ -137,10 +142,10 @@ criarRotasCrud({
   rota: '/produtos',
   obterArray: () => produtos,
   camposObrigatorios: ['nome', 'preco', 'categoriaId'],
-  validarCriacao: (body) => !categorias.some((categoria) => categoria.id === Number(body.categoriaId))
+  validarCriacao: (body) => !categoriaExiste(body.categoriaId)
     ? { status: 400, mensagem: 'A categoria informada não existe' }
     : null,
-  validarAtualizacao: (body) => !categorias.some((categoria) => categoria.id === Number(body.categoriaId))
+  validarAtualizacao: (body) => !categoriaExiste(body.categoriaId)
     ? { status: 400, mensagem: 'A categoria informada não existe' }
     : null,
 });
