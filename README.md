@@ -19,10 +19,10 @@ As rotas `/clientes`, `/categorias`, `/fornecedores` e `/produtos` possuem:
 - `PUT /rota/:id` — substitui;
 - `DELETE /rota/:id` — remove.
 
-Validações implementadas:
+Regras implementadas:
 
 - cliente não aceita email repetido (`409`);
-- produto só aceita `categoriaId` existente (`400`);
+- ao cadastrar um produto, a categoria informada é criada automaticamente se ainda não existir;
 - fornecedor exige CNPJ com 14 caracteres (`400`);
 - campos obrigatórios ausentes retornam `400`;
 - registro inexistente retorna `404`.
@@ -46,7 +46,7 @@ Validações implementadas:
 
 Envie novamente o mesmo email. A resposta esperada é `409`.
 
-### Criar produto com categoria válida
+### Criar produto e categoria automaticamente
 
 `POST http://localhost:3000/produtos`
 
@@ -54,6 +54,8 @@ Envie novamente o mesmo email. A resposta esperada é `409`.
 {
   "nome": "Fone de ouvido",
   "preco": 99.9,
-  "categoriaId": "Eletrônicos"
+  "categoriaId": "Coisas de escritorio"
 }
 ```
+
+Ao enviar esse produto, a categoria também será criada automaticamente em `/categorias` caso ainda não exista.

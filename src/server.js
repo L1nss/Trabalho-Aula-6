@@ -15,11 +15,7 @@ let clientes = [
   },
 ];
 
-let categorias = [
-  { id: 1, nome: 'Eletrônicos', descricao: 'Produtos eletrônicos' },
-  { id: 2, nome: 'Livros', descricao: 'Livros e materiais de leitura' },
-  { id: 3, nome: 'Coisas de escritório', descricao: 'Materiais para escritório' },
-];
+let categorias = [];
 
 let fornecedores = [
   {
@@ -30,14 +26,7 @@ let fornecedores = [
   },
 ];
 
-let produtos = [
-  {
-    id: 1,
-    nome: 'Smartphone XYZ',
-    preco: 1999.99,
-    categoriaId: 'Eletrônicos',
-  },
-];
+let produtos = [];
 
 function proximoId(array) {
   return array.length ? Math.max(...array.map((item) => item.id)) + 1 : 1;
@@ -52,11 +41,21 @@ function idValido(param) {
   return Number.isInteger(id) && id > 0 ? id : null;
 }
 
-function categoriaExiste(valor) {
-  return categorias.some((categoria) => categoria.nome.toLowerCase() === String(valor).trim().toLowerCase());
+function normalizarTexto(valor) {
+  return String(valor).trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 }
 
-function criarRotasCrud({ rota, obterArray, camposObrigatorios, validarCriacao, validarAtualizacao }) {
+function categoriaExiste(valor) {
+  return categorias.some((categoria) => normalizarTexto(categoria.nome) === normalizarTexto(valor));
+}
+
+function criarCategoriaSeNecessario(nome) {
+  if (!categoriaExiste(nome)) {
+    categorias.push({ id: proximoId(categorias), nome: String(nome).trim(), descricao: '' });
+  }
+}
+
+function criarRotasCrud({ rota, obterArray, camposObrigatorios, validarCriacao, validarAtualizacao, prepararCriacao }) {
   app.get(rota, (req, res) => res.json(obterArray()));
 
   app.get(`${rota}/:id`, (req, res) => {
@@ -73,6 +72,7 @@ function criarRotasCrud({ rota, obterArray, camposObrigatorios, validarCriacao, 
     const erro = validarCriacao?.(req.body);
     if (erro) return res.status(erro.status).json({ erro: erro.mensagem });
 
+    prepararCriacao?.(req.body);
     const array = obterArray();
     const novo = { id: proximoId(array), ...req.body };
     array.push(novo);
@@ -142,9 +142,7 @@ criarRotasCrud({
   rota: '/produtos',
   obterArray: () => produtos,
   camposObrigatorios: ['nome', 'preco', 'categoriaId'],
-  validarCriacao: (body) => !categoriaExiste(body.categoriaId)
-    ? { status: 400, mensagem: 'A categoria informada não existe' }
-    : null,
+  prepararCriacao: (body) => criarCategoriaSeNecessario(body.categoriaId),
   validarAtualizacao: (body) => !categoriaExiste(body.categoriaId)
     ? { status: 400, mensagem: 'A categoria informada não existe' }
     : null,
