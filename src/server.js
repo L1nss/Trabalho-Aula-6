@@ -29,7 +29,14 @@ let fornecedores = [
   },
 ];
 
-let produtos = [];
+let produtos = [
+  {
+    id: 1,
+    nome: 'Smartphone XYZ',
+    preco: 1999.99,
+    categoriaId: 1,
+  },
+];
 
 function proximoId(array) {
   return array.length ? Math.max(...array.map((item) => item.id)) + 1 : 1;
